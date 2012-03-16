@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, ThreadingExampleActivity!</string>
+    <string name="app_name">ThreadingExample</string>
+    <string name="bRunText">Run</string>
+    <string name="tvEmpty"></string>
+
+</resources>
