@@ -8,11 +8,12 @@ import android.widget.Button;
 public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, Float[]> {
 	private int m_numElements;
 	private Button m_bRun;
+	private OnTaskFinishedListener<Float[]> m_finListener;
 	
 	@Override
 	protected Float[] doInBackground(VectorGenerationData... data) {
-		m_numElements = data[0].getVectorLenght();
-		m_bRun = data[0].getbRun();
+		m_numElements = data[0].getVectorLength();
+		m_bRun = data[0].getButton();
 		m_bRun.setClickable(false);
 		m_bRun.setPressed(false);
 		
@@ -29,5 +30,6 @@ public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, 
 	protected void onPostExecute(Float[] result) {
 		m_bRun.setClickable(true);
 		m_bRun.setPressed(true);
+		m_finListener.onTaskFinish(result);
 	}	
 }
