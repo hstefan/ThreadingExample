@@ -17,9 +17,9 @@ public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, 
 		m_bRun.setClickable(false);
 		m_bRun.setPressed(false);
 		
-		Float[] ret = new Float[m_numElements];
+		Float[] ret = new Float[m_numElements*2]; //lol at my lazyness
 		Random r = new Random();
-		for(int i = 0; i < m_numElements; ++i) {
+		for(int i = 0; i < m_numElements*2; ++i) {
 			ret[i] = r.nextFloat()*r.nextInt(30);
 		}
 		
