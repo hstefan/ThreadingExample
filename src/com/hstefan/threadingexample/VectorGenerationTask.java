@@ -10,6 +10,11 @@ public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, 
 	private Button m_bRun;
 	private OnTaskFinishedListener<Float[]> m_finListener;
 	
+	public VectorGenerationTask setOnFinishListener(OnTaskFinishedListener<Float[]> listener) {
+		this.m_finListener = listener;
+		return this;
+	}
+
 	@Override
 	protected Float[][] doInBackground(VectorGenerationData... data) {
 		m_numElements = data[0].getVectorLength();
@@ -31,6 +36,7 @@ public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, 
 	protected void onPostExecute(Float[][] result) {
 		m_bRun.setClickable(true);
 		m_bRun.setPressed(true);
-		m_finListener.onTaskFinish(result);
+		if(m_finListener != null)
+			m_finListener.onTaskFinish(result);
 	}	
 }
