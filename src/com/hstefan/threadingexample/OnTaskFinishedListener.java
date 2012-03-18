@@ -1,5 +1,5 @@
 package com.hstefan.threadingexample;
 
 public interface OnTaskFinishedListener<T> {
-	void onTaskFinish(T result);
+	void onTaskFinish(Float[][] result);
 }
