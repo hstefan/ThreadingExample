@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class ThreadingExampleActivity extends Activity implements OnTaskFinishedListener<Float[]>, 
@@ -21,6 +22,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 	private Float[] m_u, m_v;
 	private AsyncTask<Float[], Void, Float>[] m_Tasks;
 	private DotProductThreadingSingleton m_dotInstance;
+	private boolean firstTime = true;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,8 +53,12 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 
 	@Override
 	public void onClick(View v) {
-		Runtime rTime  = Runtime.getRuntime();
-		calculateDotProduct(rTime.availableProcessors());
+		if(firstTime) {
+			calculateDotProduct(1);
+		} else {
+			Runtime rTime  = Runtime.getRuntime();
+			calculateDotProduct(rTime.availableProcessors());
+		}
 	}
 	
 	private void calculateDotProduct(int numThreads) {
@@ -71,7 +77,20 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 
 	@Override
 	public void onDotProductCalculation(float res) {
-		Toast.makeText(this, Long.toString(m_dotInstance.getElapsedTime()), 
-				Toast.LENGTH_LONG*20).show();
+		TextView tView = (TextView) findViewById(R.id.tvResult);
+		StringBuilder sBuilder = new StringBuilder();
+		if(firstTime) {
+			sBuilder.append("Program took ");
+			sBuilder.append(m_dotInstance.getElapsedTime());
+			sBuilder.append("ms to calculate dot product with 1 thread(s) running.");
+		} else {
+			sBuilder.append("Program took ");
+			sBuilder.append(m_dotInstance.getElapsedTime());
+			sBuilder.append("ms to calculate dot product with");
+			sBuilder.append(Runtime.getRuntime().availableProcessors());
+			sBuilder.append(" thread(s) running.");
+		}
+		tView.setText(sBuilder);
+		firstTime = !firstTime;
 	}
 }
