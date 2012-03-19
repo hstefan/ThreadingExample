@@ -1,6 +1,7 @@
 package com.hstefan.threadingexample;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class DotProductAsyncTask extends AsyncTask<Float[], Void, Float> {
 
@@ -19,6 +20,7 @@ public class DotProductAsyncTask extends AsyncTask<Float[], Void, Float> {
 	
 	@Override
 	protected void onPostExecute(Float result) {
-		super.onPostExecute(result);
+		Log.d("Thread", "Reached post execution state. Partial result: " + result);
+		DotProductThreadingSingleton.getInstance().threadEnded(result);
 	}
 }
