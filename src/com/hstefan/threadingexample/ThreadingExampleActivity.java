@@ -3,6 +3,8 @@ package com.hstefan.threadingexample;
 import java.util.Arrays;
 import java.util.concurrent.Executor;
 
+import com.hstefan.threadingexample.DotProductThreadingSingleton.OnDotProductCalculationListener;
+
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,12 +12,15 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
-public class ThreadingExampleActivity extends Activity implements OnTaskFinishedListener<Float[]>, OnClickListener {
+public class ThreadingExampleActivity extends Activity implements OnTaskFinishedListener<Float[]>, 
+	OnClickListener, OnDotProductCalculationListener {
 
 	/** Called when the activity is first created. */
 	private Float[] m_u, m_v;
 	private AsyncTask<Float[], Void, Float>[] m_Tasks;
+	private DotProductThreadingSingleton m_dotInstance;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -25,7 +30,8 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
     	bRun.setOnClickListener((android.view.View.OnClickListener) this);
         new VectorGenerationTask().setOnFinishListener(this).execute(
         	new VectorGenerationData(300000, bRun, this));
-        
+        m_dotInstance = DotProductThreadingSingleton.getInstance();
+        m_dotInstance.setOnDotProductCalculationListener(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -53,12 +59,19 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 		int sliceSz = m_u.length/numThreads;
 		int numSlices = m_u.length/sliceSz;
 		Executor tExec = AsyncTask.THREAD_POOL_EXECUTOR;
-		
+		m_dotInstance.setNumThreads(numThreads);
+		m_dotInstance.startTimer();
 		for(int slice = 0; slice < numSlices; slice++) {
 			Log.d("Thread", "Spawning thread #" + slice);
 			m_Tasks[slice] = new DotProductAsyncTask().executeOnExecutor(tExec, 
 					Arrays.copyOfRange(m_u, slice*sliceSz, slice*sliceSz + sliceSz),
 					Arrays.copyOfRange(m_v, slice*sliceSz, slice*sliceSz + sliceSz));
 		}
+	}
+
+	@Override
+	public void onDotProductCalculation(float res) {
+		Toast.makeText(this, Long.toString(m_dotInstance.getElapsedTime()), 
+				Toast.LENGTH_LONG*20).show();
 	}
 }
