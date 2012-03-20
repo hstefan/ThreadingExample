@@ -29,6 +29,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
     	setContentView(R.layout.main);
         
     	Button bRun = (Button)findViewById(R.id.bRun);
+    	bRun.setClickable(false);
     	bRun.setOnClickListener((android.view.View.OnClickListener) this);
     	Toast.makeText(this, "Generating vector", Toast.LENGTH_LONG).show();
         new VectorGenerationTask().setOnFinishListener(this).execute(
@@ -41,6 +42,8 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 	@Override
 	public void onTaskFinish(Float[][] result) {
 		Toast.makeText(this, "Vector generated", Toast.LENGTH_LONG).show();
+		Button bRun = (Button)findViewById(R.id.bRun);
+		bRun.setClickable(true);
 		Runtime rTime  = Runtime.getRuntime();
 		m_u = result[0];
 		m_v = result[1];
