@@ -34,8 +34,6 @@ public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, 
 	
 	@Override
 	protected void onPostExecute(Float[][] result) {
-		m_bRun.setClickable(true);
-		m_bRun.setPressed(true);
 		if(m_finListener != null)
 			m_finListener.onTaskFinish(result);
 	}	
