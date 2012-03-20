@@ -10,6 +10,8 @@ public class DotProductThreadingSingleton {
 	private int m_runningThreads;
 	private float m_acc;
 	private OnDotProductCalculationListener m_listener;
+	private Float m_u[];
+	private Float m_v[];
 	
 	private DotProductThreadingSingleton() {   }
 	 
@@ -46,7 +48,24 @@ public class DotProductThreadingSingleton {
     	m_listener = lst;
     }
     
+    public void setVectorUVector(Float[] u) {
+    	m_u = u;
+    }
+    
+    public void setVectorVVector(Float[] v) {
+    	m_u = v;
+    }
+    
+    public Float[] getVectorU() {
+    	return m_u;
+    }
+    
+    public Float[] getVectorV() {
+    	return m_v;
+    }
+    
     public interface OnDotProductCalculationListener {
     	void onDotProductCalculation(float res);
     }
+    
 }
