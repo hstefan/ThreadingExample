@@ -1,7 +1,5 @@
 package com.hstefan.threadingexample;
 
-import java.util.Random;
-
 import android.os.AsyncTask;
 import android.widget.Button;
 
@@ -23,12 +21,11 @@ public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, 
 		m_bRun.setPressed(false);
 		
 		Float[][] ret = new Float[2][m_numElements];
-		Random r = new Random();
 		for(int i = 0; i < m_numElements; ++i) {
-			ret[0][i] = r.nextFloat()*r.nextInt(30);
-			ret[1][i] = r.nextFloat()*r.nextInt(30);
+			ret[0][i] = (float) i;
 		}
 		
+		ret[1] = ret[0];
 		return ret;
 	}
 	
