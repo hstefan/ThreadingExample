@@ -30,6 +30,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
         
     	Button bRun = (Button)findViewById(R.id.bRun);
     	bRun.setOnClickListener((android.view.View.OnClickListener) this);
+    	Toast.makeText(this, "Generating vector", Toast.LENGTH_LONG).show();
         new VectorGenerationTask().setOnFinishListener(this).execute(
         	new VectorGenerationData(300000, bRun, this));
         m_dotInstance = DotProductThreadingSingleton.getInstance();
@@ -39,6 +40,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 
 	@Override
 	public void onTaskFinish(Float[][] result) {
+		Toast.makeText(this, "Vector generated", Toast.LENGTH_LONG).show();
 		Runtime rTime  = Runtime.getRuntime();
 		m_u = result[0];
 		m_v = result[1];
@@ -54,7 +56,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 	@Override
 	public void onClick(View v) {
 		if(firstTime) {
-			calculateDotProduct(1);
+			calculateDotProduct(2);
 		} else {
 			Runtime rTime  = Runtime.getRuntime();
 			calculateDotProduct(rTime.availableProcessors());
@@ -67,11 +69,11 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 		Executor tExec = AsyncTask.THREAD_POOL_EXECUTOR;
 		m_dotInstance.setNumThreads(numThreads);
 		m_dotInstance.startTimer();
-		for(int slice = 0; slice < numSlices; slice++) {
+		for(int slice = 0; slice < numSlices; ++slice) {
 			Log.d("Thread", "Spawning thread #" + slice);
 			m_Tasks[slice] = new DotProductAsyncTask().executeOnExecutor(tExec, 
-					Arrays.copyOfRange(m_u, slice*sliceSz, slice*sliceSz + sliceSz),
-					Arrays.copyOfRange(m_v, slice*sliceSz, slice*sliceSz + sliceSz));
+					Arrays.copyOfRange(m_u, slice*sliceSz, (slice*sliceSz) + sliceSz),
+					Arrays.copyOfRange(m_v, slice*sliceSz, (slice*sliceSz) + sliceSz));
 		}
 	}
 
