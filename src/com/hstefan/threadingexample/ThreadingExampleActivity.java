@@ -1,6 +1,8 @@
 package com.hstefan.threadingexample;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 import com.hstefan.threadingexample.DotProductThreadingSingleton.OnDotProductCalculationListener;
@@ -20,7 +22,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 
 	/** Called when the activity is first created. */
 	private Float[] m_u, m_v;
-	private AsyncTask<Float[], Void, Float>[] m_Tasks;
+	private List<AsyncTask<Float[], Void, Float>> m_Tasks;
 	private DotProductThreadingSingleton m_dotInstance;
 	private boolean firstTime = true;
 	
@@ -36,6 +38,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
         	new VectorGenerationData(300000, bRun, this));
         m_dotInstance = DotProductThreadingSingleton.getInstance();
         m_dotInstance.setOnDotProductCalculationListener(this);
+        m_Tasks = new ArrayList<AsyncTask<Float[],Void,Float>>();
         super.onCreate(savedInstanceState);
     }
 
@@ -44,22 +47,14 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 		Toast.makeText(this, "Vector generated", Toast.LENGTH_LONG).show();
 		Button bRun = (Button)findViewById(R.id.bRun);
 		bRun.setClickable(true);
-		Runtime rTime  = Runtime.getRuntime();
 		m_u = result[0];
 		m_v = result[1];
-		
-		int sliceSz = m_u.length/rTime.availableProcessors();
-		int numSlices = m_u.length/sliceSz;
-		
-		if(m_Tasks == null) {
-			m_Tasks = new DotProductAsyncTask[numSlices];
-		}
 	}
 
 	@Override
 	public void onClick(View v) {
 		if(firstTime) {
-			calculateDotProduct(2);
+			calculateDotProduct(1);
 		} else {
 			Runtime rTime  = Runtime.getRuntime();
 			calculateDotProduct(rTime.availableProcessors());
@@ -72,11 +67,13 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 		Executor tExec = AsyncTask.THREAD_POOL_EXECUTOR;
 		m_dotInstance.setNumThreads(numThreads);
 		m_dotInstance.startTimer();
+		m_Tasks.clear();
 		for(int slice = 0; slice < numSlices; ++slice) {
 			Log.d("Thread", "Spawning thread #" + slice);
-			m_Tasks[slice] = new DotProductAsyncTask().executeOnExecutor(tExec, 
+			assert((slice*sliceSz >= 0) && (slice*sliceSz + sliceSz <= m_u.length));
+			m_Tasks.add(new DotProductAsyncTask().executeOnExecutor(tExec, 
 					Arrays.copyOfRange(m_u, slice*sliceSz, (slice*sliceSz) + sliceSz),
-					Arrays.copyOfRange(m_v, slice*sliceSz, (slice*sliceSz) + sliceSz));
+					Arrays.copyOfRange(m_v, slice*sliceSz, (slice*sliceSz) + sliceSz)));
 		}
 	}
 
