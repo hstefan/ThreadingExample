@@ -1,6 +1,5 @@
 package com.hstefan.threadingexample;
 
-import java.util.Arrays;
 import java.util.Calendar;
 
 public class DotProductThreadingSingleton {
