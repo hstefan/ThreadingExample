@@ -26,6 +26,9 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 	private DotProductThreadingSingleton m_dotInstance;
 	private boolean firstTime = true;
 	private int m_numThreadsLRun;
+	
+	public static final int VEC_SIZE = 800000;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	setContentView(R.layout.main);
@@ -35,7 +38,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
     	bRun.setOnClickListener((android.view.View.OnClickListener) this);
     	Toast.makeText(this, "Generating vector", Toast.LENGTH_LONG).show();
         new VectorGenerationTask().setOnFinishListener(this).execute(
-        	new VectorGenerationData(300000, bRun, this));
+        	new VectorGenerationData(VEC_SIZE, bRun, this));
         m_dotInstance = DotProductThreadingSingleton.getInstance();
         m_dotInstance.setOnDotProductCalculationListener(this);
         m_Tasks = new ArrayList<AsyncTask<Float[],Void,Float>>();
