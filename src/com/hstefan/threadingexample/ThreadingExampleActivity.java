@@ -1,7 +1,6 @@
 package com.hstefan.threadingexample;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -22,12 +21,12 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 
 	/** Called when the activity is first created. */
 	private Float[] m_u, m_v;
-	private List<AsyncTask<Float[], Void, Float>> m_Tasks;
+	private List<AsyncTask<Integer, Void, Float>> m_Tasks;
 	private DotProductThreadingSingleton m_dotInstance;
 	private boolean firstTime = true;
 	private int m_numThreadsLRun;
 	
-	public static final int VEC_SIZE = 800000;
+	public static final int VEC_SIZE = 80000;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,8 +40,9 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
         	new VectorGenerationData(VEC_SIZE, bRun, this));
         m_dotInstance = DotProductThreadingSingleton.getInstance();
         m_dotInstance.setOnDotProductCalculationListener(this);
-        m_Tasks = new ArrayList<AsyncTask<Float[],Void,Float>>();
+        m_Tasks = new ArrayList<AsyncTask<Integer,Void,Float>>();
         m_numThreadsLRun = 0;
+        
         super.onCreate(savedInstanceState);
     }
 
@@ -53,6 +53,8 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 		bRun.setClickable(true);
 		m_u = result[0];
 		m_v = result[1];
+		m_dotInstance.setVectorUVector(m_u);
+		m_dotInstance.setVectorVVector(m_v);
 	}
 
 	@Override
@@ -66,6 +68,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 	}
 	
 	private void calculateDotProduct(int numThreads) {
+		Log.d("MethodCall", "calculateDotProduct");
 		int sliceSz = m_u.length/numThreads;
 		int numSlices = m_u.length/sliceSz;
 		Executor tExec = AsyncTask.THREAD_POOL_EXECUTOR;
@@ -76,14 +79,14 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 			Log.d("Thread", "Spawning thread #" + slice);
 			assert((slice*sliceSz >= 0) && (slice*sliceSz + sliceSz <= m_u.length));
 			m_Tasks.add(new DotProductAsyncTask().executeOnExecutor(tExec, 
-					Arrays.copyOfRange(m_u, slice*sliceSz, (slice*sliceSz) + sliceSz),
-					Arrays.copyOfRange(m_v, slice*sliceSz, (slice*sliceSz) + sliceSz)));
+					slice*sliceSz, (slice*sliceSz) + sliceSz));
 		}
 		m_numThreadsLRun = numThreads;
 	}
 
 	@Override
 	public void onDotProductCalculation(float res) {
+		Log.d("MethodCall", "onDotProductCalculation");
 		TextView tView = (TextView) findViewById(R.id.tvResult);
 		StringBuilder sBuilder = new StringBuilder();
 		sBuilder.append("Program took ");
@@ -94,4 +97,6 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 		tView.setText(sBuilder);
 		firstTime = !firstTime;
 	}
+	
+	
 }

@@ -1,5 +1,6 @@
 package com.hstefan.threadingexample;
 
+import java.util.Arrays;
 import java.util.Calendar;
 
 public class DotProductThreadingSingleton {
@@ -10,8 +11,8 @@ public class DotProductThreadingSingleton {
 	private int m_runningThreads;
 	private float m_acc;
 	private OnDotProductCalculationListener m_listener;
-	private Float m_u[];
-	private Float m_v[];
+	private Float[] m_u;
+	private Float[] m_v;
 	
 	private DotProductThreadingSingleton() {   }
 	 
@@ -39,7 +40,7 @@ public class DotProductThreadingSingleton {
     	m_runningThreads--;
     	m_acc += partialRes;
     	if(m_runningThreads == 0) {
-    		if(m_listener != null) 
+    		if(m_listener != null)
     			m_listener.onDotProductCalculation(m_acc);
     	}
     }
@@ -48,19 +49,19 @@ public class DotProductThreadingSingleton {
     	m_listener = lst;
     }
     
-    public void setVectorUVector(Float[] u) {
+    public synchronized void setVectorUVector(Float[] u) {
     	m_u = u;
     }
     
-    public void setVectorVVector(Float[] v) {
-    	m_u = v;
+    public synchronized void setVectorVVector(Float[] v) {
+    	m_v = v;
     }
     
-    public Float[] getVectorU() {
+    public synchronized Float[] getVectorU() {
     	return m_u;
     }
     
-    public Float[] getVectorV() {
+    public synchronized Float[] getVectorV() {
     	return m_v;
     }
     

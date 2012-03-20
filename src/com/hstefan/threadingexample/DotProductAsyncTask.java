@@ -3,16 +3,19 @@ package com.hstefan.threadingexample;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class DotProductAsyncTask extends AsyncTask<Float[], Void, Float> {
+public class DotProductAsyncTask extends AsyncTask<Integer, Void, Float> {
 
 	@Override
-	protected Float doInBackground(Float[]... vecs) {
+	protected Float doInBackground(Integer... index) {
 		Float res = 0.f;
+		DotProductThreadingSingleton l_inst = DotProductThreadingSingleton.getInstance();
+		Float u[] = l_inst.getVectorU();
+		Float v[] = l_inst.getVectorV();
+		assert(index.length == 2);
+		assert(u != null && v != null);
 		
-		assert(vecs.length == 2 && vecs[0].length == vecs[1].length);
-		
-		for(int i = 0; i < vecs[0].length; ++i) {
-			res += vecs[0][i]*vecs[1][i];
+		for(int i = index[0]; i < index[1]; ++i) {
+			res += u[i]*v[i];
 		}
 		
 		return res;
