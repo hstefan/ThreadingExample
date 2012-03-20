@@ -9,10 +9,12 @@ import com.hstefan.threadingexample.DotProductThreadingSingleton.OnDotProductCal
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +25,6 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 	private Float[] m_u, m_v;
 	private List<AsyncTask<Integer, Void, Float>> m_Tasks;
 	private DotProductThreadingSingleton m_dotInstance;
-	private boolean firstTime = true;
 	private int m_numThreadsLRun;
 	
 	public static final int VEC_SIZE = 80000;
@@ -59,12 +60,14 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 
 	@Override
 	public void onClick(View v) {
-		if(firstTime) {
-			calculateDotProduct(1);
-		} else {
-			Runtime rTime  = Runtime.getRuntime();
-			calculateDotProduct(rTime.availableProcessors());
+		EditText eThreadNum = (EditText) findViewById(R.id.eNumThreads);
+		Editable eEntry = eThreadNum.getText();
+		if(eEntry.toString().isEmpty()) {
+			eEntry.append("0");
 		}
+		
+		int numThreads = Integer.parseInt(eEntry.toString());
+		calculateDotProduct(numThreads);
 	}
 	
 	private void calculateDotProduct(int numThreads) {
@@ -95,7 +98,6 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 		sBuilder.append(m_numThreadsLRun);
 		sBuilder.append(" thread(s) running.");
 		tView.setText(sBuilder);
-		firstTime = !firstTime;
 	}
 	
 	

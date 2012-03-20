@@ -5,12 +5,28 @@
     android:layout_margin="10dip"
     android:gravity="center_horizontal"
     android:orientation="vertical" >
-
-    <Button
-        android:id="@+id/bRun"
+
+    <LinearLayout
+        android:id="@+id/lRunBox"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/bRunText" />
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/bRun"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/bRunText" />
+
+        <EditText
+            android:id="@+id/eNumThreads"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="number" 
+            android:maxLength="1"
+            android:minWidth="80dp"
+            android:layout_width="wrap_content"/>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvResult"
