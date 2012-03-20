@@ -25,7 +25,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 	private List<AsyncTask<Float[], Void, Float>> m_Tasks;
 	private DotProductThreadingSingleton m_dotInstance;
 	private boolean firstTime = true;
-	
+	private int m_numThreadsLRun;
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	setContentView(R.layout.main);
@@ -39,6 +39,7 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
         m_dotInstance = DotProductThreadingSingleton.getInstance();
         m_dotInstance.setOnDotProductCalculationListener(this);
         m_Tasks = new ArrayList<AsyncTask<Float[],Void,Float>>();
+        m_numThreadsLRun = 0;
         super.onCreate(savedInstanceState);
     }
 
@@ -75,23 +76,18 @@ public class ThreadingExampleActivity extends Activity implements OnTaskFinished
 					Arrays.copyOfRange(m_u, slice*sliceSz, (slice*sliceSz) + sliceSz),
 					Arrays.copyOfRange(m_v, slice*sliceSz, (slice*sliceSz) + sliceSz)));
 		}
+		m_numThreadsLRun = numThreads;
 	}
 
 	@Override
 	public void onDotProductCalculation(float res) {
 		TextView tView = (TextView) findViewById(R.id.tvResult);
 		StringBuilder sBuilder = new StringBuilder();
-		if(firstTime) {
-			sBuilder.append("Program took ");
-			sBuilder.append(m_dotInstance.getElapsedTime());
-			sBuilder.append("ms to calculate dot product with 1 thread(s) running.");
-		} else {
-			sBuilder.append("Program took ");
-			sBuilder.append(m_dotInstance.getElapsedTime());
-			sBuilder.append("ms to calculate dot product with");
-			sBuilder.append(Runtime.getRuntime().availableProcessors());
-			sBuilder.append(" thread(s) running.");
-		}
+		sBuilder.append("Program took ");
+		sBuilder.append(m_dotInstance.getElapsedTime());
+		sBuilder.append("ms to calculate dot product with ");
+		sBuilder.append(m_numThreadsLRun);
+		sBuilder.append(" thread(s) running.");
 		tView.setText(sBuilder);
 		firstTime = !firstTime;
 	}
