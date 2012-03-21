@@ -13,6 +13,7 @@ import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -43,7 +44,6 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
         m_dotInstance.setOnDotProductCalculationListener(this);
         m_Tasks = new ArrayList<AsyncTask<Integer,Void,Float>>();
         m_numThreadsLRun = 0;
-        
         super.onCreate(savedInstanceState);
     }
 
@@ -95,7 +95,7 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 	@Override
 	public void onDotProductCalculation(float res) {
 		Log.d("MethodCall", "onDotProductCalculation");
-		TextView tView = (TextView) findViewById(R.id.tvResult);
+		TextView tView = /*(TextView) findViewById(R.id.tvResult)*/ null;
 		StringBuilder sBuilder = new StringBuilder();
 		sBuilder.append("Program took ");
 		sBuilder.append(m_dotInstance.getElapsedTime());
