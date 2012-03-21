@@ -38,8 +38,13 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 	private SQLiteDatabase m_resultDb;
 	private SimpleCursorAdapter m_rAdapter;
 	
+	//views
+	private Button bRun;
+	private EditText eLen;
+	private EditText eThreadNum;
 	
-	public static final int VEC_SIZE = 80000;
+	public static final int DEFAULT_VEC_LENGTH = 200000;
+	public static final int DEFAULT_THREAD_NUM = 0;
 	private static String[] RESULT_DB_COLUMNS= new String[]{ BaseColumns._ID,
 		ResultDbOpenHelper.RESULT_DATE, ResultDbOpenHelper.RESULT_NUMTHREADS, 
 		ResultDbOpenHelper.RESULT_PROCTIME};
@@ -51,18 +56,19 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
     public void onCreate(Bundle savedInstanceState) {
     	setContentView(R.layout.main);
         
-    	Button bRun = (Button)findViewById(R.id.bRun);
-    	bRun.setClickable(false);
-    	bRun.setOnClickListener((android.view.View.OnClickListener) this);
-    	Toast.makeText(this, "Generating vector", Toast.LENGTH_LONG).show();
-        new VectorGenerationTask().setOnFinishListener(this).execute(
-        	new VectorGenerationData(VEC_SIZE, bRun, this));
-        m_dotInstance = DotProductThreadingSingleton.getInstance();
-        m_dotInstance.setOnDotProductCalculationListener(this);
-        m_Tasks = new ArrayList<AsyncTask<Integer,Void,Float>>();
-        m_numThreadsLRun = 0;
+    	setupViews();
+        setupDotTask();
+        generateVectors(DEFAULT_VEC_LENGTH);
         
-        m_resultsDbHelper = new ResultDbOpenHelper(this);
+        m_numThreadsLRun = 0;
+ 
+        super.onCreate(savedInstanceState);
+    }
+
+
+
+	private void setupListView() {
+		m_resultsDbHelper = new ResultDbOpenHelper(this);
         m_resultDb = m_resultsDbHelper.getWritableDatabase();
         
         Cursor c = m_resultDb.query(ResultDbOpenHelper.RESULT_TABLE, 
@@ -74,8 +80,37 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
         
         ListView lView = (ListView)findViewById(R.id.lResultList);
         lView.setAdapter(m_rAdapter);
-        super.onCreate(savedInstanceState);
-    }
+	}
+
+
+
+	private void setupDotTask() {
+		m_dotInstance = DotProductThreadingSingleton.getInstance();
+        m_dotInstance.setOnDotProductCalculationListener(this);
+        m_Tasks = new ArrayList<AsyncTask<Integer,Void,Float>>();
+	}
+
+
+
+	private void setupViews() {
+		bRun = (Button)findViewById(R.id.bRun);
+    	bRun.setClickable(false);
+    	bRun.setOnClickListener((android.view.View.OnClickListener) this);
+    	eLen = (EditText)findViewById(R.id.eNumElements);
+    	eLen.setText(Integer.toString(DEFAULT_VEC_LENGTH));
+    	eThreadNum = (EditText) findViewById(R.id.eNumThreads);
+    	eThreadNum.setText(Integer.toString(DEFAULT_THREAD_NUM));
+    	
+    	setupListView();
+	}
+
+
+
+	private void generateVectors(int len) {
+		Toast.makeText(this, "Generating vector", Toast.LENGTH_LONG).show();
+        new VectorGenerationTask().setOnFinishListener(this).execute(
+        	new VectorGenerationData(len, bRun, this));
+	}
     
     
 
@@ -90,7 +125,6 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 	@Override
 	public void onTaskFinish(Float[][] result) {
 		Toast.makeText(this, "Vector generated", Toast.LENGTH_LONG).show();
-		Button bRun = (Button)findViewById(R.id.bRun);
 		bRun.setClickable(true);
 		m_u = result[0];
 		m_v = result[1];
@@ -100,19 +134,35 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 
 	@Override
 	public void onClick(View v) {
-		EditText eThreadNum = (EditText) findViewById(R.id.eNumThreads);
-		Editable eEntry = eThreadNum.getText();
-		if(eEntry.toString().isEmpty()) {
-			eEntry.append("0");
+		if(checkVectorLength()) {
+			Editable eEntry = eThreadNum.getText();
+			if(eEntry.toString().isEmpty()) {
+				eEntry.append("0");
+			}
+			
+			int numThreads = Integer.parseInt(eEntry.toString());
+			
+			if(numThreads == 0) {
+				numThreads = Runtime.getRuntime().availableProcessors();
+			}
+			
+			calculateDotProduct(numThreads);
 		}
-		
-		int numThreads = Integer.parseInt(eEntry.toString());
-		
-		if(numThreads == 0) {
-			numThreads = Runtime.getRuntime().availableProcessors();
+	}
+
+
+
+	private boolean checkVectorLength() {
+		int eLenEntry = Integer.parseInt(eLen.getEditableText().toString());
+
+		if(eLenEntry != m_u.length) {
+			Log.d("Vector generation event:", eLenEntry + "/" + m_u.length);
+			generateVectors(eLenEntry);
+			System.gc();
+			return false;
+		} else {
+			return true;
 		}
-		
-		calculateDotProduct(numThreads);
 	}
 	
 	private void calculateDotProduct(int numThreads) {

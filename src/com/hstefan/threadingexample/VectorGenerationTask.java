@@ -17,8 +17,8 @@ public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, 
 	protected Float[][] doInBackground(VectorGenerationData... data) {
 		m_numElements = data[0].getVectorLength();
 		m_bRun = data[0].getButton();
-		m_bRun.setClickable(false);
-		m_bRun.setPressed(false);
+		//m_bRun.setClickable(false);
+		//m_bRun.setPressed(false);
 		
 		Float[][] ret = new Float[2][m_numElements];
 		for(int i = 0; i < m_numElements; ++i) {
