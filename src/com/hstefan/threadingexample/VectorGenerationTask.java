@@ -33,5 +33,9 @@ public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, 
 	protected void onPostExecute(Float[][] result) {
 		if(m_finListener != null)
 			m_finListener.onTaskFinish(result);
-	}	
+	}
+	
+	public interface OnTaskFinishedListener<T> {
+		void onTaskFinish(Float[][] result);
+	}
 }

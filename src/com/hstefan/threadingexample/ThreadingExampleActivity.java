@@ -18,7 +18,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class ThreadingExampleActivity extends Activity implements OnTaskFinishedListener<Float[]>, 
+public class ThreadingExampleActivity extends Activity implements VectorGenerationTask.OnTaskFinishedListener<Float[]>, 
 	OnClickListener, OnDotProductCalculationListener {
 
 	/** Called when the activity is first created. */

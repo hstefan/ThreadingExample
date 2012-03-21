@@ -5,9 +5,10 @@ import android.widget.Button;
 public class VectorGenerationData {
 	private int m_aLen;
 	private Button m_bRun;
-	private OnTaskFinishedListener<Float[]> m_FinListener;
+	private VectorGenerationTask.OnTaskFinishedListener<Float[]> m_FinListener;
 	
-	public VectorGenerationData(int aLen, Button bRun, OnTaskFinishedListener<Float[]> finListener) {
+	public VectorGenerationData(int aLen, Button bRun, 
+			VectorGenerationTask.OnTaskFinishedListener<Float[]> finListener) {
 		super();
 		this.m_aLen = aLen;
 		this.m_bRun = bRun;
@@ -22,11 +23,11 @@ public class VectorGenerationData {
 		return m_bRun;
 	}
 	
-	public void attachListener(OnTaskFinishedListener<Float[]> listener) {
+	public void attachListener(VectorGenerationTask.OnTaskFinishedListener<Float[]> listener) {
 		m_FinListener = listener;
 	}
 	
-	public OnTaskFinishedListener<Float[]> getListener() {
+	public VectorGenerationTask.OnTaskFinishedListener<Float[]> getListener() {
 		return m_FinListener;
 	}
 }
