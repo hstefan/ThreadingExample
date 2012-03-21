@@ -11,17 +11,19 @@ import com.hstefan.threadingexample.db.ResultDbOpenHelper;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 public class ThreadingExampleActivity extends Activity implements VectorGenerationTask.OnTaskFinishedListener<Float[]>, 
@@ -32,9 +34,18 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 	private List<AsyncTask<Integer, Void, Float>> m_Tasks;
 	private DotProductThreadingSingleton m_dotInstance;
 	private int m_numThreadsLRun;
-	private ResultDbOpenHelper m_resultsDb;
+	private ResultDbOpenHelper m_resultsDbHelper;
+	private SQLiteDatabase m_resultDb;
+	private SimpleCursorAdapter m_rAdapter;
+	
 	
 	public static final int VEC_SIZE = 80000;
+	private static String[] RESULT_DB_COLUMNS= new String[]{ BaseColumns._ID,
+		ResultDbOpenHelper.RESULT_DATE, ResultDbOpenHelper.RESULT_NUMTHREADS, 
+		ResultDbOpenHelper.RESULT_PROCTIME};
+	private static int RESULT_DB_COLUMNS_LAYOUT[] = new int[]{
+		R.id.runTimestampDate, R.id.threadNum, R.id.time
+	};
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,9 +62,30 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
         m_Tasks = new ArrayList<AsyncTask<Integer,Void,Float>>();
         m_numThreadsLRun = 0;
         
-        m_resultsDb = new ResultDbOpenHelper(this);
+        m_resultsDbHelper = new ResultDbOpenHelper(this);
+        m_resultDb = m_resultsDbHelper.getWritableDatabase();
+        
+        Cursor c = m_resultDb.query(ResultDbOpenHelper.RESULT_TABLE, 
+        		RESULT_DB_COLUMNS, null, null, null, null, null);
+        m_rAdapter = new SimpleCursorAdapter(this, R.layout.result_item, c, new String[]{
+        		ResultDbOpenHelper.RESULT_DATE, ResultDbOpenHelper.RESULT_NUMTHREADS, 
+        		ResultDbOpenHelper.RESULT_PROCTIME} , 
+        		RESULT_DB_COLUMNS_LAYOUT);
+        
+        ListView lView = (ListView)findViewById(R.id.lResultList);
+        lView.setAdapter(m_rAdapter);
         super.onCreate(savedInstanceState);
     }
+    
+    
+
+	@Override
+	protected void onDestroy() {
+		m_resultsDbHelper.getWritableDatabase().close();
+		super.onDestroy();
+	}
+
+
 
 	@Override
 	public void onTaskFinish(Float[][] result) {
@@ -103,7 +135,7 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 	@Override
 	public void onDotProductCalculation(float res) {
 		Log.d("MethodCall", "onDotProductCalculation");
-		SQLiteDatabase db = m_resultsDb.getWritableDatabase();
+		SQLiteDatabase db = m_resultsDbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -113,5 +145,7 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 		values.put(ResultDbOpenHelper.RESULT_PROCTIME, m_dotInstance.getElapsedTime());
 		
 		db.insert(ResultDbOpenHelper.RESULT_TABLE, null, values);
+		
+		m_rAdapter.getCursor().requery();
 	}
 }
