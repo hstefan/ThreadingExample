@@ -67,6 +67,11 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 		}
 		
 		int numThreads = Integer.parseInt(eEntry.toString());
+		
+		if(numThreads == 0) {
+			numThreads = Runtime.getRuntime().availableProcessors();
+		}
+		
 		calculateDotProduct(numThreads);
 	}
 	
