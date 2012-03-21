@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <LinearLayout android:orientation="horizontal"
+        android:gravity="left">
+	    <TextView android:id="@+id/runTimestampDate" 
+	        android:textSize="12sp"/>
+	    <TextView android:id="@+id/runTimestampTime" 
+	        android:textSize="12sp"/>
+    </LinearLayout>
+    
+    <TextView android:id="@+id/threadNum"
+        android:layout_gravity="center" 
+        android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:textSize="16sp" />
+    <TextView android:id="@+id/time"
+        android:layout_gravity="right" 
+        android:layout_width="fill_parent"
+    	android:layout_height="fill_parent"
+    	android:textSize="16sp" />
+    
+</LinearLayout>
