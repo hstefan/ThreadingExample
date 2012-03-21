@@ -1,12 +1,17 @@
 package com.hstefan.threadingexample;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Executor;
 
 import com.hstefan.threadingexample.DotProductThreadingSingleton.OnDotProductCalculationListener;
+import com.hstefan.threadingexample.db.ResultDbOpenHelper;
 
 import android.app.Activity;
+import android.content.ContentValues;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -27,6 +32,7 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 	private List<AsyncTask<Integer, Void, Float>> m_Tasks;
 	private DotProductThreadingSingleton m_dotInstance;
 	private int m_numThreadsLRun;
+	private ResultDbOpenHelper m_resultsDb;
 	
 	public static final int VEC_SIZE = 80000;
 	
@@ -44,6 +50,8 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
         m_dotInstance.setOnDotProductCalculationListener(this);
         m_Tasks = new ArrayList<AsyncTask<Integer,Void,Float>>();
         m_numThreadsLRun = 0;
+        
+        m_resultsDb = new ResultDbOpenHelper(this);
         super.onCreate(savedInstanceState);
     }
 
@@ -95,15 +103,15 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 	@Override
 	public void onDotProductCalculation(float res) {
 		Log.d("MethodCall", "onDotProductCalculation");
-		TextView tView = /*(TextView) findViewById(R.id.tvResult)*/ null;
-		StringBuilder sBuilder = new StringBuilder();
-		sBuilder.append("Program took ");
-		sBuilder.append(m_dotInstance.getElapsedTime());
-		sBuilder.append("ms to calculate dot product with ");
-		sBuilder.append(m_numThreadsLRun);
-		sBuilder.append(" thread(s) running.");
-		tView.setText(sBuilder);
+		SQLiteDatabase db = m_resultsDb.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
+		values.put(ResultDbOpenHelper.RESULT_DATE, dateFormat.format(Calendar.getInstance().getTime()));
+		values.put(ResultDbOpenHelper.RESULT_NUMTHREADS, m_numThreadsLRun);
+		values.put(ResultDbOpenHelper.RESULT_PROCTIME, m_dotInstance.getElapsedTime());
+		
+		db.insert(ResultDbOpenHelper.RESULT_TABLE, null, values);
 	}
-	
-	
 }
