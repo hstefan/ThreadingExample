@@ -107,6 +107,7 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 
 
 	private void generateVectors(int len) {
+		bRun.setClickable(false);
 		Toast.makeText(this, "Generating vector", Toast.LENGTH_LONG).show();
         new VectorGenerationTask().setOnFinishListener(this).execute(
         	new VectorGenerationData(len, bRun, this));
@@ -130,6 +131,7 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 		m_v = result[1];
 		m_dotInstance.setVectorUVector(m_u);
 		m_dotInstance.setVectorVVector(m_v);
+		bRun.setClickable(true);
 	}
 
 	@Override
