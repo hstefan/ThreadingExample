@@ -1,20 +1,16 @@
 package com.hstefan.threadingexample;
 
+import com.hstefan.threadingexample.task.Task;
+
 import android.os.AsyncTask;
 import android.widget.Button;
 
-public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, Float[][]> {
+public class VectorGenerationTask extends Task<Integer, Float[][]> {
 	private int m_numElements;
-	private OnTaskFinishedListener<Float[]> m_finListener;
-	
-	public VectorGenerationTask setOnFinishListener(OnTaskFinishedListener<Float[]> listener) {
-		this.m_finListener = listener;
-		return this;
-	}
 
 	@Override
-	protected Float[][] doInBackground(VectorGenerationData... data) {
-		m_numElements = data[0].getVectorLength();
+	public Float[][] onRun(Integer... params) {
+		m_numElements = params[0];
 		
 		Float[][] ret = new Float[2][m_numElements];
 		for(int i = 0; i < m_numElements; ++i) {
@@ -23,15 +19,5 @@ public class VectorGenerationTask extends AsyncTask<VectorGenerationData, Void, 
 		
 		ret[1] = ret[0];
 		return ret;
-	}
-	
-	@Override
-	protected void onPostExecute(Float[][] result) {
-		if(m_finListener != null)
-			m_finListener.onTaskFinish(result);
-	}
-	
-	public interface OnTaskFinishedListener<T> {
-		void onTaskFinish(Float[][] result);
 	}
 }

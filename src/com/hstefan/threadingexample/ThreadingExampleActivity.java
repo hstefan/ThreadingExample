@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.Executor;
 
 import com.hstefan.threadingexample.DotProductThreadingSingleton.OnDotProductCalculationListener;
@@ -13,6 +15,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.location.GpsStatus.Listener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -26,7 +29,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-public class ThreadingExampleActivity extends Activity implements VectorGenerationTask.OnTaskFinishedListener<Float[]>, 
+public class ThreadingExampleActivity extends Activity implements Observer, 
 	OnClickListener, OnDotProductCalculationListener {
 
 	/** Called when the activity is first created. */
@@ -122,18 +125,6 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 	}
 
 
-
-	@Override
-	public void onTaskFinish(Float[][] result) {
-		Toast.makeText(this, "Vector generated", Toast.LENGTH_LONG).show();
-		bRun.setClickable(true);
-		m_u = result[0];
-		m_v = result[1];
-		m_dotInstance.setVectorUVector(m_u);
-		m_dotInstance.setVectorVVector(m_v);
-		bRun.setClickable(true);
-	}
-
 	@Override
 	public void onClick(View v) {
 		if(checkVectorLength()) {
@@ -199,5 +190,19 @@ public class ThreadingExampleActivity extends Activity implements VectorGenerati
 		db.insert(ResultDbOpenHelper.RESULT_TABLE, null, values);
 		
 		m_rAdapter.getCursor().requery();
+	}
+
+
+
+	@Override
+	public void update(Observable observable, Object data) {
+		Toast.makeText(this, "Vector generated", Toast.LENGTH_LONG).show();
+		bRun.setClickable(true);
+		Float[][] result = (Float[][]) data;
+		m_u = result[0];
+		m_v = result[1];
+		m_dotInstance.setVectorUVector(m_u);
+		m_dotInstance.setVectorVVector(m_v);
+		bRun.setClickable(true);
 	}
 }
