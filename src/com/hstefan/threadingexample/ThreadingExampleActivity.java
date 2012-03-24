@@ -10,6 +10,7 @@ import java.util.concurrent.Executor;
 
 import com.hstefan.threadingexample.DotProductThreadingSingleton.OnDotProductCalculationListener;
 import com.hstefan.threadingexample.db.ResultDbOpenHelper;
+import com.hstefan.threadingexample.task.Task;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -34,7 +35,6 @@ public class ThreadingExampleActivity extends Activity implements Observer,
 
 	/** Called when the activity is first created. */
 	private Float[] m_u, m_v;
-	private List<AsyncTask<Integer, Void, Float>> m_Tasks;
 	private DotProductThreadingSingleton m_dotInstance;
 	private int m_numThreadsLRun;
 	private ResultDbOpenHelper m_resultsDbHelper;
@@ -68,8 +68,6 @@ public class ThreadingExampleActivity extends Activity implements Observer,
         super.onCreate(savedInstanceState);
     }
 
-
-
 	private void setupListView() {
 		m_resultsDbHelper = new ResultDbOpenHelper(this);
         m_resultDb = m_resultsDbHelper.getWritableDatabase();
@@ -90,10 +88,7 @@ public class ThreadingExampleActivity extends Activity implements Observer,
 	private void setupDotTask() {
 		m_dotInstance = DotProductThreadingSingleton.getInstance();
         m_dotInstance.setOnDotProductCalculationListener(this);
-        m_Tasks = new ArrayList<AsyncTask<Integer,Void,Float>>();
 	}
-
-
 
 	private void setupViews() {
 		bRun = (Button)findViewById(R.id.bRun);
@@ -107,17 +102,12 @@ public class ThreadingExampleActivity extends Activity implements Observer,
     	setupListView();
 	}
 
-
-
 	private void generateVectors(int len) {
 		bRun.setClickable(false);
 		Toast.makeText(this, "Generating vector", Toast.LENGTH_LONG).show();
-        new VectorGenerationTask().setOnFinishListener(this).execute(
-        	new VectorGenerationData(len, bRun, this));
+        new VectorGenerationTask().setParams(len).add_Observer(this).run();
 	}
     
-    
-
 	@Override
 	protected void onDestroy() {
 		m_resultsDbHelper.getWritableDatabase().close();
@@ -162,15 +152,13 @@ public class ThreadingExampleActivity extends Activity implements Observer,
 		Log.d("MethodCall", "calculateDotProduct");
 		int sliceSz = m_u.length/numThreads;
 		int numSlices = m_u.length/sliceSz;
-		Executor tExec = AsyncTask.THREAD_POOL_EXECUTOR;
 		m_dotInstance.setNumThreads(numThreads);
 		m_dotInstance.startTimer();
-		m_Tasks.clear();
 		for(int slice = 0; slice < numSlices; ++slice) {
 			Log.d("Thread", "Spawning thread #" + slice);
 			assert((slice*sliceSz >= 0) && (slice*sliceSz + sliceSz <= m_u.length));
-			m_Tasks.add(new DotProductAsyncTask().executeOnExecutor(tExec, 
-					slice*sliceSz, (slice*sliceSz) + sliceSz));
+			new DotProductAsyncTask().setParams(slice*sliceSz, (slice*sliceSz) + 
+					sliceSz).add_Observer(m_dotInstance).run();
 		}
 		m_numThreadsLRun = numThreads;
 	}
@@ -191,8 +179,6 @@ public class ThreadingExampleActivity extends Activity implements Observer,
 		
 		m_rAdapter.getCursor().requery();
 	}
-
-
 
 	@Override
 	public void update(Observable observable, Object data) {

@@ -1,8 +1,10 @@
 package com.hstefan.threadingexample;
 
 import java.util.Calendar;
+import java.util.Observable;
+import java.util.Observer;
 
-public class DotProductThreadingSingleton {
+public class DotProductThreadingSingleton implements Observer {
 	static private DotProductThreadingSingleton _instance = null;
 	
 	private long m_timer;
@@ -35,15 +37,6 @@ public class DotProductThreadingSingleton {
     	m_runningThreads = m_numThreads;
     }
     
-    public synchronized void threadEnded(float partialRes) {
-    	m_runningThreads--;
-    	m_acc += partialRes;
-    	if(m_runningThreads == 0) {
-    		if(m_listener != null)
-    			m_listener.onDotProductCalculation(m_acc);
-    	}
-    }
-    
     public void setOnDotProductCalculationListener(OnDotProductCalculationListener lst) {
     	m_listener = lst;
     }
@@ -67,5 +60,16 @@ public class DotProductThreadingSingleton {
     public interface OnDotProductCalculationListener {
     	void onDotProductCalculation(float res);
     }
+
+	@Override
+	public void update(Observable observable, Object data) {
+		float partialResl = (Float) data;
+		m_runningThreads--;
+    	m_acc += partialResl;
+    	if(m_runningThreads == 0) {
+    		if(m_listener != null)
+    			m_listener.onDotProductCalculation(m_acc);
+    	}
+	}
     
 }
