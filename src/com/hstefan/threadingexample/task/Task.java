@@ -1,11 +1,12 @@
 package com.hstefan.threadingexample.task;
 
 import java.util.Observable;
+import java.util.Observer;
 
 import android.os.AsyncTask;
 
 public abstract class Task<ParamT, ResultT> extends Observable {
-	private AsyncTask<ParamT, Void, ResultT> m_task;
+	private AsyncTask<ParamT, Void, ResultT> m_intTask;
 	private ParamT m_params[];
 	
 	public abstract ResultT onRun(ParamT... params);
@@ -16,6 +17,7 @@ public abstract class Task<ParamT, ResultT> extends Observable {
 		
 		public InternalTask(Task<ParamT, ResultT> task, ParamT...params) {
 			m_params = params;
+			m_task = task;
 		}
 		
 		@Override
@@ -25,7 +27,9 @@ public abstract class Task<ParamT, ResultT> extends Observable {
 		
 		@Override
 		protected void onPostExecute(ResultT result) {
+			m_task.setChanged();
 			m_task.notifyObservers(result);
+			m_task.clearChanged();
 		}
 	}
 	
@@ -35,7 +39,12 @@ public abstract class Task<ParamT, ResultT> extends Observable {
 	}
 	
 	public void run() {
-		m_task = new InternalTask(this, m_params);
-		m_task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, m_params);
+		m_intTask = new InternalTask(this, m_params);
+		m_intTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, m_params);
+	}
+	
+	public Task<ParamT, ResultT> add_Observer(Observer o) {
+		addObserver(o);
+		return this;
 	}
 }
