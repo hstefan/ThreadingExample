@@ -19,6 +19,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.GpsStatus.Listener;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.text.Editable;
 import android.util.Log;
@@ -154,6 +155,7 @@ public class ThreadingExampleActivity extends Activity implements Observer,
 		int numSlices = m_u.length/sliceSz;
 		m_dotInstance.setNumThreads(numThreads);
 		m_dotInstance.startTimer();
+		Looper.getMainLooper().getThread().setPriority(Thread.MIN_PRIORITY);
 		for(int slice = 0; slice < numSlices; ++slice) {
 			Log.d("Thread", "Spawning thread #" + slice);
 			assert((slice*sliceSz >= 0) && (slice*sliceSz + sliceSz <= m_u.length));
@@ -166,6 +168,7 @@ public class ThreadingExampleActivity extends Activity implements Observer,
 	@Override
 	public void onDotProductCalculation(float res) {
 		Log.d("MethodCall", "onDotProductCalculation");
+		Looper.getMainLooper().getThread().setPriority(Thread.NORM_PRIORITY);
 		SQLiteDatabase db = m_resultsDbHelper.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		
