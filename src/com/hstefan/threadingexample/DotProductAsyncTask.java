@@ -15,12 +15,9 @@ public class DotProductAsyncTask extends Task<Integer, Float> {
 		Float v[] = l_inst.getVectorV();
 		assert(params.length == 2);
 		assert(u != null && v != null);
-		
-		int diff = params[1] - params[0];
-		for(int i  = 0; i < diff; ++i) {
-			for(int j = params[0]; j < params[1]; ++j) {
-				res += u[j]*v[j];
-			}
+
+		for(int j = params[0]; j < params[1]; ++j) {
+			res += u[j]*v[j];
 		}
 		return res;
 	}
