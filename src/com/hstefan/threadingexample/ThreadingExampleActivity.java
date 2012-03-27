@@ -46,7 +46,7 @@ public class ThreadingExampleActivity extends Activity implements Observer,
 	private EditText eLen;
 	private EditText eThreadNum;
 	
-	public static final int DEFAULT_VEC_LENGTH = 200000;
+	public static final int DEFAULT_VEC_LENGTH = 2000;
 	public static final int DEFAULT_THREAD_NUM = 0;
 	private static String[] RESULT_DB_COLUMNS= new String[]{ BaseColumns._ID,
 		ResultDbOpenHelper.RESULT_DATE, ResultDbOpenHelper.RESULT_NUMTHREADS, 
